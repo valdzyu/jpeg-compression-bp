@@ -1,0 +1,34 @@
+@import url("shared.css");
+
+.block-title {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0.5rem 0;
+}
+
+.block-title p {
+    margin: 0.5rem 0;
+}
+
+.content-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    margin: 1rem 0;
+    width: 1200px;
+}
+
+.content-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 1rem;
+    width: 300px;
+}
+
+.image-area {
+    background-color: #ccc;
+}

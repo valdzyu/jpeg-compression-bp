@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+	<meta charset="UTF-8"/>
+	<title>
+		Webová aplikace pro podporu výuky komprimačního algoritmu JPEG
+	</title>
+	<link rel="stylesheet" href="../styles/dct.css"/>
+</head>
+<body>
+<div class="wrapper">
+	<div class="describe">
+		<p class="title">
+			Ilustrace efektu změny DCT koeficientů na vzhled obrazu
+		</p>
+		<p>
+			Daný applet slouží k znázornění průběhu komprese obrazových dat prostřednictvím Diskrétní kosinové transformace
+			a následného kvantování DCT koeficientů v rámci algoritmu JPEG.
+		</p>
+		<p>
+			V levé části okna je umístěna galerie obrázků ke zpracování.
+			Jednotlivý blok pixelů je možné vybrat kliknutím po obrázku „Výběr bloku 8 &#x2715; 8 pixelů“.
+			Pak tady lze zvolit kvalitu obrazu a také ukázat nebo schovat hodnoty matic pomocí přepínače „Ukázat hodnoty“.
+			Sled celého procesu je označen šipkami.
+		</p>
+	</div>
+	<div class="working-area-wrapper">
+		<div class="working-area">
+			<div class="image-selector block-content side-area">
+				<div class="images-block">
+					<form action="#" class="image-control form">
+						<div class="image-container">
+							<label>
+								<input type="radio" name="image-selector" value="bw_1" checked/>
+								<img src="../assets/bw_1.png" alt="source"/>
+							</label>
+						</div>
+						<div class="image-container">
+							<label>
+								<input type="radio" name="image-selector" value="bw_2"/>
+								<img src="../assets/bw_2.png" alt="source2"/>
+							</label>
+						</div>
+						<div class="image-container">
+							<label>
+								<input type="radio" name="image-selector" value="bw_3"/>
+								<img src="../assets/bw_3.png" alt="source3"/>
+							</label>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="processing-area" style="width: calc(100% - 50px)">
+				<div class="content-row">
+					<div class="content-block-wrapper align-bottom">
+						<div class="content-block">
+							<div class="block-title">
+								<p>Výběr bloku 8 &#x2715; 8 pixelů</p>
+							</div>
+							<div class="image-block">
+								<div class="image-area medium-image-area" id="selectPixelsBlockImageArea">
+									<canvas id="originalCanvas" width="320" height="320"></canvas>
+								</div>
+								<div class="overlay" id="selectPixelsBlockImageAreaOverlay">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="content-block-wrapper align-bottom">
+						<div class="content-block">
+							<div class="block-title">
+								<p>Blok 8 &#x2715; 8 pixelů</p>
+							</div>
+							<div class="image-block">
+								<div class="image-area small-image-area">
+									<canvas id="originalCroppedCanvas" width="240" height="240"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="arrow-block-wrapper align-bottom">
+						<div class="arrow-block up-row">
+							<div class="arrow">
+								<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/></svg>
+							</div>
+						</div>
+					</div>
+					<div class="content-block-wrapper align-bottom">
+						<div class="content-block">
+							<div class="block-title">
+								<p>DCT koefiecienty</p>
+							</div>
+							<div class="image-block">
+								<div class="image-area small-image-area">
+									<canvas id="dctCanvas" width="240" height="240"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="arrow-block-wrapper align-bottom">
+						<div class="arrow-block up-row">
+							<div class="arrow">
+								<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/></svg>
+							</div>
+						</div>
+					</div>
+					<div class="content-block-wrapper align-bottom">
+						<div class="content-block">
+							<div class="controls-section">
+								<div class="controls-section-title">
+									<p>Kvalita</p>
+								</div>
+								<div class="controls-section-controls">
+									<div class="slider-input">
+										<input type="number" id="qualityInput" value="50" min="0" max="100"/>
+									</div>
+									<div class="slider-container">
+										<input
+												type="range"
+												id="qualitySlider"
+												name="quality"
+												min="1"
+												max="100"
+												value="50"
+												step="1"
+										/>
+									</div>
+								</div>
+								<div class="controls-section-title">
+									<p>Zobrazit hodnoty</p>
+								</div>
+								<div class="controls-section-controls">
+									<input type="checkbox" id="canvasValuesDisplaySwitcher">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="content-row">
+					<div class="content-block-wrapper align-top">
+						<div class="content-block">
+							<div class="block-title">
+								<p>Vysledný obrazek</p>
+							</div>
+							<div class="image-block">
+								<div class="image-area medium-image-area">
+									<canvas id="resultCanvas" width="320" height="320"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="content-block-wrapper align-top">
+						<div class="content-block">
+							<div class="block-title">
+								<p>Vysledný blok 8 &#x2715; 8 po IDCT</p>
+							</div>
+							<div class="image-block">
+								<div class="image-area small-image-area">
+									<canvas id="idctCanvas" width="240" height="240"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="arrow-block-wrapper align-top">
+						<div class="arrow-block down-row">
+							<div class="arrow">
+								<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M2.117 12l7.527 6.235-.644.765-9-7.521 9-7.479.645.764-7.529 6.236h21.884v1h-21.883z"/></svg>							</div>
+						</div>
+					</div>
+					<div class="content-block-wrapper align-top">
+						<div class="content-block">
+							<div class="block-title">
+								<p>Vynásobení kvantovaci maticí</p>
+							</div>
+							<div class="image-block">
+								<div class="image-area small-image-area">
+									<canvas id="dequantizationCanvas" width="240" height="240"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="arrow-block-wrapper align-top">
+						<div class="arrow-block down-row">
+							<div class="arrow">
+								<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M2.117 12l7.527 6.235-.644.765-9-7.521 9-7.479.645.764-7.529 6.236h21.884v1h-21.883z"/></svg>							</div>
+						</div>
+					</div>
+					<div class="content-block-wrapper align-top">
+						<div class="content-block">
+							<div class="block-title">
+								<p>Kvantované DCT koeficienty</p>
+							</div>
+							<div class="image-block">
+								<div class="image-area small-image-area">
+									<canvas id="quantizationCanvas" width="240" height="240"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="description">
+		<p class="article-title">Diskrétní kosinová transformace</p>
+		<p>
+			Algoritmus JPEG využívá dvourozměrnou variantu diskrétní kosinové transformace DCT-II a zpětnou DCT-II (IDCT) pro dekódování obrazu.
+			Před samotnou transformací celý obrázek se rozdělí na bloky 8 &#x2715; 8 pixelů a od hodnoty pixelů se odečte 128.
+			Pak se každý koeficient v bloku projde vzorcem diskrétní kosinové transformace.
+			Výsledkem je matice DCT koeficientů. V levém horním rohu dané matice je tzv. stejnosměrný DC koeficient, ve kterém je soustředěna většina obrazových dat celého bloku.
+			Ostatní 63 střídavé AC koeficienty mají mnohem menší rozsah nebo dokonce nulovou hodnotu.
+		</p>
+		<p class="article-title">Kvantování</p>
+		<p>
+			Kvantování je v algoritmu JPEG hlavním ztrátovým procesem, který umožňuje se zbavit informace, která téměř neovlivňuje vzhled obrazu.
+			Právě v tomto kroku lze vybrat úroveň komprese obrazu v rozsahu od 1 do 100.
+			Během kvantování se každý prvek DCT matice dělí odpovídajícím prvkem kvantizační matice, která se generuje podle úrovně komprese, a zaokrouhluje se na celá čísla.
+			Daným krokem se dosahuje zmenšení amplitudy koeficientů a tím i zvětšení počtu nul, které se pak jednodušeji zakódují.
+		</p>
+	</div>
+</div>
+</body>
+<script src="../scripts/constants.js"></script>
+<script src="../scripts/utils.js"></script>
+<script src="../scripts/functions.js"></script>
+<script src="../scripts/canvas.js"></script>
+<script src="../scripts/dct.js"></script>
+<script src="../scripts/magnifier.js"></script>
+<script>
+    const controller = new DCTController();
+    controller.init();
+</script>
+</html>

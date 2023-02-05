@@ -1,0 +1,159 @@
+@import url("shared.css");
+
+.content-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+    width: 1200px;
+}
+
+.content-block-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0.5rem;
+    width: 300px;
+}
+
+.arrow-block-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.arrow-block {
+    display: flex;
+    align-items: center;
+}
+
+.arrow-block.up-row {
+    height: 240px;
+}
+
+.arrow-block.down-row {
+    height: 299px;
+}
+
+.processing-block {
+    flex: 0 1 0;
+    min-width: 40%;
+    margin: auto 0;
+}
+
+.block-title {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0.5rem 0;
+}
+
+.block-title p, .controls-section-title p {
+    margin: 0;
+}
+
+.image-block {
+    margin: 0 auto 1rem;
+    position: relative;
+}
+
+.image-area {
+    background-color: #ccc;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    z-index: 999;
+}
+
+.overlay * {
+    margin: 0;
+    padding: 0;
+}
+
+.overlay .overlay-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+.overlay .overlay-cell {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: 100%;
+}
+
+.select-pixels-area-cell {
+    border: none;
+    box-sizing: border-box;
+}
+
+.selected {
+    border: 1px solid #0175ff;
+}
+
+.select-pixels-area-cell:hover {
+    cursor: pointer;
+    background-color: rgb(0, 0, 0, 0.1);
+}
+
+.canvas-values-grid-cell {
+    border: none;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.canvas-values-grid-cell:hover {
+    cursor: pointer;
+    background-color: rgb(255, 255, 255, 0.2);
+}
+
+.canvas-values-grid-cell-value {
+    font-size: 9px;
+}
+
+.controls-section {
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.controls-section > * {
+    width: 100%;
+    margin: 0.5rem 0;
+}
+
+.controls-section-title {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.slider-container {
+    position: relative;
+    width: 50px;
+    height: 120px;
+    margin: .5rem auto;
+}
+
+.slider-container input {
+    transform-origin: top left;
+    transform: rotate(-90deg) translateX(-100%);
+    margin: auto;
+    width: 120px;
+    height: 50px;
+}
