@@ -1,5 +1,3 @@
-// todo remove unused
-
 // generuje kvantizační matici dle zvolené kvality
 const generateQuantizationMatrix = (quality) => {
   const matrix = new Array(64);
@@ -110,8 +108,7 @@ const getChunksByScheme = (array, subsamplingScheme, width) => {
   } else if (subsamplingScheme === "4:4:4") {
     return getGrid(array, 1);
   } else if (subsamplingScheme === "4:2:0") {
-    const squares = getSquares(array, 2, width);
-    return squares;
+    return getSquares(array, 2, width);
   }
   return [];
 };

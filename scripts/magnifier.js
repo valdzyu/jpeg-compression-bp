@@ -119,7 +119,7 @@
       );
     }
 
-    function _bind(event, currentMagnifier = null) {
+    function _bind(event) {
       if (!magnifierShow) {
         return;
       }

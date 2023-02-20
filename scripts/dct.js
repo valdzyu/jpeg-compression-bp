@@ -289,8 +289,6 @@ class DCTController {
     cells.forEach((cell, index) => {
       const valueToDisplay = canvas.pixelsData.originalValues[index];
       const valueToCalculateColor = normalizedValues[index];
-      console.log(valueToCalculateColor, valueToDisplay);
-      // if value 0 - 127, then color of text is white
       if (valueToCalculateColor >= 0 && valueToCalculateColor <= 127) {
         cell.style.color = "white";
       } else {
@@ -325,7 +323,7 @@ class DCTController {
     const canvasValuesDisplaySwitcher = document.querySelector(
       "#canvasValuesDisplaySwitcher"
     );
-    canvasValuesDisplaySwitcher.addEventListener("change", (event) => {
+    canvasValuesDisplaySwitcher.addEventListener("change", () => {
       const overlay = document.querySelectorAll(".canvas-values-overlay");
       overlay.forEach((overlay) => {
         overlay.classList.toggle("hidden");
@@ -529,14 +527,6 @@ const getAllProcessingStepsPixelsData = (pixelsData, quality) => {
     );
   }
   return resultPixelsData;
-};
-
-// pomocná funkce pro připravení hodnoty pixelu pro zobrazení (1 -> 1; 1.2 -> 1.20; 1.234 -> 1.23)
-const preparePixelValueToDisplay = (value) => {
-  if (Number.isInteger(value)) {
-    return value;
-  }
-  return parseFloat(value).toFixed(2);
 };
 
 // vrací seznam skupin buněk s elementy hodnot pixelů podle jejich pozice
