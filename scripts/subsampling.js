@@ -127,56 +127,12 @@ class SubsamplingController {
 
   // inicializuje lupy a nastavuje jejich parametry
   initZoom() {
-    let magnifiers = [];
     const canvases = [
-      this.transformationRGBCanvas,
-      this.transformationYCCCanvas,
-      this.subsamplingCanvas,
+      this.transformationRGBCanvas.targetElement,
+      this.transformationYCCCanvas.targetElement,
+      this.subsamplingCanvas.targetElement,
     ];
-    for (const canvas of canvases) {
-      const magnifier = JyMagnifier({
-        canvasSelector: canvas.targetElement,
-        wrapperSelector: ".wrapper",
-        ratio: 16,
-        width: 240,
-        height: 240,
-      });
-      magnifiers.push(magnifier);
-      canvas.targetElement.addEventListener("mousemove", showMagnifiers);
-      canvas.targetElement.addEventListener("mousewheel", showMagnifiers);
-      canvas.targetElement.addEventListener("mouseout", hideMagnifiers);
-      document.addEventListener("keyup", onKeyUp);
-
-      function onKeyUp(e) {
-        if (["ControlLeft", "ControlRight"].includes(e.code)) {
-          const otherMagnifiers = magnifiers.filter((m) => m !== magnifier);
-          for (const m of otherMagnifiers) {
-            m.show(false);
-          }
-        }
-      }
-
-      function showMagnifier(e, m) {
-        m.show(true);
-        m.bind(e);
-      }
-
-      function showMagnifiers(e) {
-        if (!e.ctrlKey) {
-          showMagnifier(e, magnifier);
-          return;
-        }
-        for (const m of magnifiers) {
-          showMagnifier(e, m);
-        }
-      }
-
-      function hideMagnifiers() {
-        for (const m of magnifiers) {
-          m.show(false);
-        }
-      }
-    }
+    initMultipleZoom(canvases);
   }
 
   // nastaví nový vstupní obrázek

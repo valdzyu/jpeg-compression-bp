@@ -31,6 +31,7 @@ class DCTController {
     this.initSlider();
     this.initPixelsSelector();
     this.initCanvasValuesDisplaySwitcher();
+    this.initCanvasPixelsValues();
   }
 
   // inicializace ovladání výběru obrázku
@@ -299,6 +300,26 @@ class DCTController {
     });
   }
 
+  // inicializuje chování při najetí myši na buňku s hodnotou pixelu
+  initCanvasPixelsValues() {
+    const cells = document.querySelectorAll(".canvas-values-grid-cell");
+    const cellsGroups = getCellsGroups(cells);
+    cellsGroups.forEach((cellsGroup) => {
+      cellsGroup.forEach((cell) => {
+        cell.addEventListener("mouseover", () => {
+          cellsGroup.forEach((cell) => {
+            cell.classList.add("hovered");
+          });
+        });
+        cell.addEventListener("mouseout", () => {
+          cellsGroup.forEach((cell) => {
+            cell.classList.remove("hovered");
+          });
+        });
+      });
+    });
+  }
+
   // inicializace prvku pro ovládání zobrazení hodnot pixelů
   initCanvasValuesDisplaySwitcher() {
     const canvasValuesDisplaySwitcher = document.querySelector(
@@ -327,26 +348,11 @@ class DCTController {
 
   // inicializace lupy
   initZoom() {
-    const target = this.resultCanvas.targetElement;
-    const magnifier = JyMagnifier({
-      canvasSelector: target,
-      wrapperSelector: ".wrapper",
-      ratio: 16,
-      width: 240,
-      height: 240,
-    });
-    target.addEventListener("mousemove", showMagnifier, false);
-    target.addEventListener("mousewheel", showMagnifier, false);
-    target.addEventListener("mouseout", hideMagnifier);
-
-    function showMagnifier(e) {
-      magnifier.show(true);
-      magnifier.bind(e);
-    }
-
-    function hideMagnifier() {
-      magnifier.show(false);
-    }
+    const canvases = [
+      this.originalCanvas.targetElement,
+      this.resultCanvas.targetElement,
+    ];
+    initMultipleZoom(canvases);
   }
 }
 
@@ -532,3 +538,18 @@ const preparePixelValueToDisplay = (value) => {
   }
   return parseFloat(value).toFixed(2);
 };
+
+// vrací seznam skupin buněk s elementy hodnot pixelů podle jejich pozice
+const getCellsGroups = (cells) => {
+  const cellsGroupsByPosition = {};
+  cells.forEach((cell) => {
+    const column = cell.getAttribute("data-column");
+    const row = cell.getAttribute("data-row");
+    const key = `${column}-${row}`;
+    if (!cellsGroupsByPosition[key]) {
+      cellsGroupsByPosition[key] = [];
+    }
+    cellsGroupsByPosition[key].push(cell);
+  });
+  return Object.values(cellsGroupsByPosition);
+}

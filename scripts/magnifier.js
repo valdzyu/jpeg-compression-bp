@@ -180,3 +180,73 @@
     };
   };
 });
+
+const initMultipleZoom = (canvases) => {
+  let magnifiers = [];
+  for (const canvas of canvases) {
+    const magnifier = JyMagnifier({
+      canvasSelector: canvas,
+      wrapperSelector: ".wrapper",
+      ratio: 16,
+      width: 240,
+      height: 240,
+    });
+    magnifiers.push(magnifier);
+    canvas.addEventListener("mousemove", showMagnifiers);
+    canvas.addEventListener("mousewheel", showMagnifiers);
+    canvas.addEventListener("mouseout", hideMagnifiers);
+    document.addEventListener("keyup", onKeyUp);
+
+    function onKeyUp(e) {
+      if (["ControlLeft", "ControlRight"].includes(e.code)) {
+        const otherMagnifiers = magnifiers.filter((m) => m !== magnifier);
+        for (const m of otherMagnifiers) {
+          m.show(false);
+        }
+      }
+    }
+
+    function showMagnifier(e, m) {
+      m.show(true);
+      m.bind(e);
+    }
+
+    function showMagnifiers(e) {
+      if (!e.ctrlKey) {
+        showMagnifier(e, magnifier);
+        return;
+      }
+      for (const m of magnifiers) {
+        showMagnifier(e, m);
+      }
+    }
+
+    function hideMagnifiers() {
+      for (const m of magnifiers) {
+        m.show(false);
+      }
+    }
+  }
+};
+
+const initSingleZoom = (canvas) => {
+  const magnifier = JyMagnifier({
+    canvasSelector: canvas,
+    wrapperSelector: ".wrapper",
+    ratio: 16,
+    width: 240,
+    height: 240,
+  });
+  canvas.addEventListener("mousemove", showMagnifier, false);
+  canvas.addEventListener("mousewheel", showMagnifier, false);
+  canvas.addEventListener("mouseout", hideMagnifier);
+
+  function showMagnifier(e) {
+    magnifier.show(true);
+    magnifier.bind(e);
+  }
+
+  function hideMagnifier() {
+    magnifier.show(false);
+  }
+}

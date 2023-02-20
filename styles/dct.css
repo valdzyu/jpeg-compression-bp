@@ -114,7 +114,7 @@
     align-items: center;
 }
 
-.canvas-values-grid-cell:hover {
+.canvas-values-grid-cell.hovered {
     cursor: pointer;
     background-color: rgb(255, 255, 255, 0.2);
 }
