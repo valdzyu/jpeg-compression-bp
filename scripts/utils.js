@@ -1,5 +1,5 @@
 // vrací objekt obsahující pouze zadané seznamem atributy
-function pick(obj, props) {
+const pick = (obj, props) => {
   if (!obj || !props) return;
   let picked = {};
   props.forEach(function (prop) {
@@ -9,7 +9,7 @@ function pick(obj, props) {
 }
 
 // vrací seznam bloků velikosti SxS, kde S - zvolená velikost bloku
-function getSquares(array, squareSize, imageWidth) {
+const getSquares = (array, squareSize, imageWidth) => {
   const rows = getGrid(array, imageWidth);
   const squares = [];
   for (let row = 0; row < rows.length; row += squareSize) {

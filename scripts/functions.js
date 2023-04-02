@@ -101,7 +101,7 @@ const getRoundingFunctionByMode = (roundingMode) => {
 }
 
 // vrací objekt s YCbCr komponentami po konverzi z RGB
-function convertRGBtoYCC(pixel) {
+const convertRGBtoYCC = (pixel) => {
   const r = pixel.r;
   const g = pixel.g;
   const b = pixel.b;
@@ -112,7 +112,7 @@ function convertRGBtoYCC(pixel) {
 }
 
 // vrací objekt s RGB komponentami po konverzi z YCbCr
-function convertYCCtoRGB(pixel) {
+const convertYCCtoRGB = (pixel) => {
   const y = pixel.y;
   const cb = pixel.cb;
   const cr = pixel.cr;
@@ -167,7 +167,7 @@ const applySubsamplingToChunks = (chunks, subsamplingScheme, pixelsData) => {
 }
 
 // vrací průměrnou hodnotu zvolené složky
-function getAverageOfComponent(pixels, component) {
+const getAverageOfComponent = (pixels, component) => {
   const componentValues = pixels.map((x) => x[component]);
   const sum = componentValues.reduce((a, b) => a + b, 0);
   return sum / pixels.length;
@@ -185,7 +185,7 @@ const getImageDataFromImage = (filePath) => {
 };
 
 // vytvoří nový element img a nastaví mu zadanou cestu
-function createImageElement(fileName) {
+const createImageElement = (fileName) => {
   const image = document.createElement("img");
   image.src = fileName;
   return image;
