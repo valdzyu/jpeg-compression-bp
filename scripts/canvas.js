@@ -78,6 +78,13 @@ class PixelsData {
     return new PixelsData(pixels, colorMode, this.width, this.height);
   }
 
+  // metoda pro změnu barvového modelu pixelů v objektu
+  changeColorMode(colorMode) {
+    if (this.colorMode === colorMode) return;
+    this.pixels = convertPixels(this.pixels, this.colorMode, colorMode);
+    this.colorMode = colorMode;
+  }
+
   // metoda pro získání ImageData objektu
   generateImageData() {
     return getFilledImageData(
@@ -89,7 +96,10 @@ class PixelsData {
   }
 
   // metoda pro pridaní hodnot pixelů do objektu na zadaných souřadnicích bloku
-  addPixelValues(values, blockRow, blockCol, blockWidth, blockHeight) {
+  addPixelValues(values, blockRow, blockCol, blockWidth, blockHeight, fillOnlyComponents = null) {
+    if (fillOnlyComponents === null) {
+      fillOnlyComponents = COLOR_MODE_COMPONENTS[this.colorMode];
+    }
     for (let row = 0; row < blockHeight; row++) {
       for (let col = 0; col < blockWidth; col++) {
         const index =
@@ -98,10 +108,10 @@ class PixelsData {
           blockCol * blockWidth;
         this.pixels[index] = createPixelWithComponents(
           values[row * blockWidth + col],
-          COLOR_MODE_COMPONENTS[this.colorMode],
+          this.colorMode,
           row + blockRow * blockHeight,
           col + blockCol * blockWidth,
-          COLOR_MODE_COMPONENTS[this.colorMode]
+          fillOnlyComponents
         );
       }
     }
@@ -137,7 +147,7 @@ class PixelsData {
         const index = i * height + j;
         const pixel = createPixelWithComponents(
           values[index],
-          COLOR_MODE_COMPONENTS[colorMode],
+          colorMode,
           i,
           j,
           fillOnlyComponents
@@ -222,14 +232,16 @@ const pushPixelToImageData = (imageData, pixel, col, row) => {
 // vrací objekt pixelu s zadanými komponentami a hodnotami
 const createPixelWithComponents = (
   value,
-  components,
+  colorMode,
   row,
   column,
   fillComponents
 ) => {
   const pixel = {};
+  const components = COLOR_MODE_COMPONENTS[colorMode];
+  const defaultPixelValue = colorMode === COLOR_MODES.YCC ? 128 : 0;
   components.forEach((comp) => {
-    pixel[comp] = fillComponents.includes(comp) ? value : 0;
+    pixel[comp] = fillComponents.includes(comp) ? value : defaultPixelValue;
     pixel.row = row;
     pixel.col = column;
   });

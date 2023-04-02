@@ -64,9 +64,12 @@ const absoluteValues = (arr) => {
 
 // normalizuje hodnoty v seznamu do rozsahu 0-255
 const normalizeValues = (arr) => {
-  return arr.map((x) => {
-    if (x < 0) return 0;
-    if (x > 255) return 255;
-    return x;
-  });
+  return arr.map((x) => normalizeValue(x));
 };
+
+// normalizuje hodnotu do rozsahu 0-255
+const normalizeValue = (value) => {
+  if (value < 0) return 0;
+  if (value > 255) return 255;
+  return value;
+}

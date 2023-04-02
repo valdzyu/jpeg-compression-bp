@@ -79,6 +79,27 @@ const applyIDCT = (block) => {
   return result;
 };
 
+// aplikuje zvolenou metodu zaokrouhlování na hodnoty v poli
+const applySpecificRoundingMode = (values, roundingMode) => {
+  const roundingFunction = getRoundingFunctionByMode(roundingMode);
+  return values.map((value) => {
+    return roundingFunction(value);
+  });
+}
+
+// vrací funkci pro zaokrouhlování podle zvoleného módu
+const getRoundingFunctionByMode = (roundingMode) => {
+  if (roundingMode === "0.5_plus") {
+    return (value) => value + 0.5;
+  } else if (roundingMode === "0.5_minus") {
+    return (value) => value - 0.5;
+  } else if (roundingMode === "random_in_interval") {
+    const randomNumberInInterval = Math.round((Math.random() - 0.5) * 10) / 10
+    return (value) => value + randomNumberInInterval;
+  }
+  return (x) => x;
+}
+
 // vrací objekt s YCbCr komponentami po konverzi z RGB
 function convertRGBtoYCC(pixel) {
   const r = pixel.r;
@@ -125,6 +146,25 @@ const applySubsamplingToChunk = (chunk) => {
   }
   return subsampledPixels;
 };
+
+// aplikuje podvzorkování na chunk pixelů
+const applySubsamplingToChunks = (chunks, subsamplingScheme, pixelsData) => {
+  for (const chunk of chunks) {
+    if (subsamplingScheme === "4:2:0") {
+      const chunkAfterSubsampling = applySubsamplingToChunk(chunk.square);
+      pixelsData.addPixels(
+        chunkAfterSubsampling,
+        chunk.squareRow,
+        chunk.squareCol,
+        2,
+        2
+      );
+    } else {
+      const chunkAfterSubsampling = applySubsamplingToChunk(chunk);
+      pixelsData.pixels.push(...chunkAfterSubsampling);
+    }
+  }
+}
 
 // vrací průměrnou hodnotu zvolené složky
 function getAverageOfComponent(pixels, component) {

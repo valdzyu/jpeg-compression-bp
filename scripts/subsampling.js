@@ -1,16 +1,18 @@
 // výchozí schématy a barevné složky pro plátna
-const DEFAULT_RGB_TRANSFORMATION = "original";
+const DEFAULT_ORIGINAL_RGB_TRANSFORMATION = "original";
 const DEFAULT_YCC_TRANSFORMATION = "y";
 const DEFAULT_SUBSAMPLING_SCHEME = "4:4:4";
-const DEFAULT_SUBSAMPLING_TRANSFORMATION = "original";
+const DEFAULT_SUBSAMPLING_TRANSFORMATION = "y";
+const DEFAULT_RESULT_RGB_TRANSFORMATION = "original";
 
 // třída kontrolující DCT aplet
-class SubsamplingController {
+class SubsamplingAppletController {
   constructor() {
-    this.transformationRGBValue = DEFAULT_RGB_TRANSFORMATION;
-    this.transformationYCCValue = DEFAULT_YCC_TRANSFORMATION;
-    this.subsamplingScheme = DEFAULT_SUBSAMPLING_SCHEME;
-    this.subsamplingTransformationValue = DEFAULT_SUBSAMPLING_TRANSFORMATION;
+    this.originalColorValue = DEFAULT_ORIGINAL_RGB_TRANSFORMATION;
+    this.transformationColorValue = DEFAULT_YCC_TRANSFORMATION;
+    this.subsamplingSchemeValue = DEFAULT_SUBSAMPLING_SCHEME;
+    this.subsamplingColorValue = DEFAULT_SUBSAMPLING_TRANSFORMATION;
+    this.resultColorValue = DEFAULT_RESULT_RGB_TRANSFORMATION;
     this.originalPixelsData = null;
   }
 
@@ -25,13 +27,13 @@ class SubsamplingController {
   // vkládá počáteční data do pláten
   initCanvases() {
     this.setImage(DEFAULT_SOURCE_FILE_NAME);
-    this.transformationRGBCanvas = new Canvas(
-      "#transformationRGBCanvas",
+    this.originalCanvas = new Canvas(
+      "#originalCanvas",
       MEDIUM_CANVAS_SIZE,
       MEDIUM_CANVAS_SIZE
     );
     this.transformationYCCCanvas = new Canvas(
-      "#transformationYCCCanvas",
+      "#transformationCanvas",
       MEDIUM_CANVAS_SIZE,
       MEDIUM_CANVAS_SIZE
     );
@@ -40,31 +42,37 @@ class SubsamplingController {
       MEDIUM_CANVAS_SIZE,
       MEDIUM_CANVAS_SIZE
     );
+    this.resultCanvas = new Canvas(
+      "#resultCanvas",
+      MEDIUM_CANVAS_SIZE,
+      MEDIUM_CANVAS_SIZE
+    );
     this.updateWorkingCanvases();
   }
 
   // aktualizace všech pláten při změně obrázku
   updateWorkingCanvases() {
-    this.updateTransformationRGBCanvas();
-    this.updateTransformationYCCCanvas();
+    this.updateOriginalCanvas();
+    this.updateTransformationCanvas();
     this.updateSubsamplingCanvas();
+    this.updateResultCanvas();
   }
 
   // aktualizace plátna s RGB transformací
-  updateTransformationRGBCanvas() {
-    const transformationPixelsData = getTransformationRGBPixelsData(
+  updateOriginalCanvas() {
+    const transformationPixelsData = getOriginalPixelsData(
       this.originalPixelsData,
-      this.transformationRGBValue
+      this.originalColorValue
     );
-    this.transformationRGBCanvas.setPixelsData(transformationPixelsData);
-    this.transformationRGBCanvas.update();
+    this.originalCanvas.setPixelsData(transformationPixelsData);
+    this.originalCanvas.update();
   }
 
   // aktualizace plátna s YCC transformací
-  updateTransformationYCCCanvas() {
-    const transformationPixelsData = getTransformationYCCPixelsData(
+  updateTransformationCanvas() {
+    const transformationPixelsData = getTransformationPixelsData(
       this.originalPixelsData,
-      this.transformationYCCValue
+      this.transformationColorValue
     );
     this.transformationYCCCanvas.setPixelsData(transformationPixelsData);
     this.transformationYCCCanvas.update();
@@ -74,11 +82,22 @@ class SubsamplingController {
   updateSubsamplingCanvas() {
     const subsamplingPixelsData = getSubsamplingPixelsData(
       this.originalPixelsData,
-      this.subsamplingScheme,
-      this.subsamplingTransformationValue
+      this.subsamplingSchemeValue,
+      this.subsamplingColorValue
     );
     this.subsamplingCanvas.setPixelsData(subsamplingPixelsData);
     this.subsamplingCanvas.update();
+  }
+
+  // aktualizace plátna s výsledným obrázkem
+  updateResultCanvas() {
+    const resultPixelsData = getResultPixelsData(
+      this.originalPixelsData,
+      this.subsamplingSchemeValue,
+      this.resultColorValue
+    );
+    this.resultCanvas.setPixelsData(resultPixelsData);
+    this.resultCanvas.update();
   }
 
   // nastavuje jak se mají chovat jednotlivé typy přepínačů u pláten
@@ -90,27 +109,33 @@ class SubsamplingController {
       let valueAttrName;
       let updateFunctionName;
       switch (radioButton.getAttribute("name")) {
-        case "transformationRGB-select":
-          valueAttrName = "transformationRGBValue";
-          updateFunctionName = "updateTransformationRGBCanvas";
+        case "originalColor-select":
+          valueAttrName = "originalColorValue";
+          updateFunctionName = ["updateOriginalCanvas"];
           break;
-        case "transformationYCC-select":
-          valueAttrName = "transformationYCCValue";
-          updateFunctionName = "updateTransformationYCCCanvas";
+        case "transformationColor-select":
+          valueAttrName = "transformationColorValue";
+          updateFunctionName = ["updateTransformationCanvas"];
           break;
-        case "subsampling-scheme-control":
-          valueAttrName = "subsamplingScheme";
-          updateFunctionName = "updateSubsamplingCanvas";
+        case "subsamplingScheme-select":
+          valueAttrName = "subsamplingSchemeValue";
+          updateFunctionName = ["updateSubsamplingCanvas", "updateResultCanvas"];
           break;
-        case "subsampling-transformation-select":
-          valueAttrName = "subsamplingTransformationValue";
-          updateFunctionName = "updateSubsamplingCanvas";
+        case "subsamplingColor-select":
+          valueAttrName = "subsamplingColorValue";
+          updateFunctionName = ["updateSubsamplingCanvas"];
+          break;
+        case "resultColor-select":
+          valueAttrName = "resultColorValue";
+          updateFunctionName = ["updateResultCanvas"];
           break;
       }
       if (valueAttrName && updateFunctionName)
         radioButton.addEventListener("change", (e) => {
           this[valueAttrName] = e.target.value;
-          this[updateFunctionName]();
+          for (const functionName of updateFunctionName) {
+            this[functionName]();
+          }
         });
     }
   }
@@ -128,9 +153,10 @@ class SubsamplingController {
   // inicializuje lupy a nastavuje jejich parametry
   initZoom() {
     const canvases = [
-      this.transformationRGBCanvas.targetElement,
+      this.originalCanvas.targetElement,
       this.transformationYCCCanvas.targetElement,
       this.subsamplingCanvas.targetElement,
+      this.resultCanvas.targetElement,
     ];
     initMultipleZoom(canvases);
   }
@@ -147,7 +173,7 @@ class SubsamplingController {
 }
 
 // získání objektu PixelsData s pixely po RGB transformaci
-const getTransformationRGBPixelsData = (
+const getOriginalPixelsData = (
   pixelsData,
   transformationComponent
 ) => {
@@ -167,7 +193,7 @@ const getTransformationRGBPixelsData = (
 };
 
 // získání objektu PixelsData s pixely po RGB transformaci
-const getTransformationYCCPixelsData = (
+const getTransformationPixelsData = (
   pixelsData,
   transformationComponent
 ) => {
@@ -201,24 +227,7 @@ const getSubsamplingPixelsData = (
     subsamplingScheme,
     pixelsData.width
   );
-  for (const chunk of chunks) {
-    if (subsamplingScheme === "4:2:0") {
-      const chunkAfterSubsampling = applySubsamplingToChunk(chunk.square);
-      resultPixelsData.addPixels(
-        chunkAfterSubsampling,
-        chunk.squareRow,
-        chunk.squareCol,
-        2,
-        2
-      );
-    } else {
-      const chunkAfterSubsampling = applySubsamplingToChunk(chunk);
-      resultPixelsData.pixels.push(...chunkAfterSubsampling);
-    }
-  }
-  if (transformationComponent === "original") {
-    return resultPixelsData.convertToColorMode(COLOR_MODES.RGB);
-  }
+  applySubsamplingToChunks(chunks, subsamplingScheme, resultPixelsData);
   const componentValues = resultPixelsData.getComponentValues(
     transformationComponent
   );
@@ -227,5 +236,40 @@ const getSubsamplingPixelsData = (
     COLOR_MODES.YCC,
     pixelsData.width,
     pixelsData.height
+  );
+};
+
+// získání objektu PixelsData s pixely po aplikaci podvzorkování a transformace
+const getResultPixelsData = (
+  pixelsData,
+  subsamplingScheme,
+  transformationComponent
+) => {
+  pixelsData = pixelsData.convertToColorMode(COLOR_MODES.YCC);
+  let resultPixelsData = new PixelsData(
+    [],
+    COLOR_MODES.YCC,
+    pixelsData.width,
+    pixelsData.height
+  );
+  const chunks = getChunksByScheme(
+    pixelsData.pixels,
+    subsamplingScheme,
+    pixelsData.width
+  );
+  applySubsamplingToChunks(chunks, subsamplingScheme, resultPixelsData);
+  resultPixelsData.changeColorMode(COLOR_MODES.RGB);
+  if (transformationComponent === "original") {
+    return resultPixelsData
+  }
+  const componentValues = resultPixelsData.getComponentValues(
+    transformationComponent
+  );
+  return PixelsData.fromValues(
+    componentValues,
+    COLOR_MODES.RGB,
+    pixelsData.width,
+    pixelsData.height,
+    transformationComponent
   );
 };

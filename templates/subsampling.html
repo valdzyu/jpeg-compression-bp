@@ -66,44 +66,110 @@
 									<div class="align-left">
 										<form action="#" class="canvas-control form">
 											<input
-													type="radio"
-													id="transformationRGB-select_original"
-													name="transformationRGB-select"
-													value="original"
-													checked
+												type="radio"
+												id="originalColor-select_original"
+												name="originalColor-select"
+												value="original"
+												checked
 											/>
-											<label for="transformationRGB-select_original"
+											<label for="originalColor-select_original"
 											>Originál</label
 											>
 											<input
-													type="radio"
-													id="transformationRGB-select_r"
-													name="transformationRGB-select"
-													value="r"
+												type="radio"
+												id="originalColor-select_r"
+												name="originalColor-select"
+												value="r"
 											/>
-											<label for="transformationRGB-select_r">R</label>
+											<label for="originalColor-select_r">R</label>
 											<input
-													type="radio"
-													id="transformationRGB-select_g"
-													name="transformationRGB-select"
-													value="g"
+												type="radio"
+												id="originalColor-select_g"
+												name="originalColor-select"
+												value="g"
 											/>
-											<label for="transformationRGB-select_g">G</label>
+											<label for="originalColor-select_g">G</label>
 											<input
-													type="radio"
-													id="transformationRGB-select_b"
-													name="transformationRGB-select"
-													value="b"
+												type="radio"
+												id="originalColor-select_b"
+												name="originalColor-select"
+												value="b"
 											/>
-											<label for="transformationRGB-select_b">B</label>
+											<label for="originalColor-select_b">B</label>
 										</form>
 									</div>
-									<div class="image-area medium-image-area" id="transformationRGBImageArea">
-										<canvas id="transformationRGBCanvas" width="320" height="320"></canvas>
+									<div class="image-area medium-image-area" id="originalImageArea">
+										<canvas id="originalCanvas" width="320" height="320"></canvas>
 									</div>
 								</div>
 							</div>
 						</div>
+						<div class="content-block-wrapper area">
+							<div class="content-block">
+								<div class="block-title">
+									<p>Výsledný obrázek</p>
+								</div>
+								<div class="image-block">
+									<div class="align-left">
+										<form action="#" class="canvas-control form">
+											<input
+												type="radio"
+												id="resultColor-select_original"
+												name="resultColor-select"
+												value="original"
+												checked
+											/>
+											<label for="resultColor-select_original"
+											>Originál</label
+											>
+											<input
+												type="radio"
+												id="resultColor-select_r"
+												name="resultColor-select"
+												value="r"
+											/>
+											<label for="resultColor-select_r">R</label>
+											<input
+												type="radio"
+												id="resultColor-select_g"
+												name="resultColor-select"
+												value="g"
+											/>
+											<label for="resultColor-select_g">G</label>
+											<input
+												type="radio"
+												id="resultColor-select_b"
+												name="resultColor-select"
+												value="b"
+											/>
+											<label for="resultColor-select_b">B</label>
+										</form>
+									</div>
+									<div class="image-area medium-image-area" id="resultImageArea">
+										<canvas id="resultCanvas" width="320" height="320"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="content-column">
+						<div class="arrow-block-wrapper align-top">
+							<div class="arrow-block up-row">
+								<div class="arrow">
+									<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+										<path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
+									</svg>
+								</div>
+							</div>
+						</div>
+						<div class="arrow-block-wrapper align-bottom">
+							<div class="arrow-block down-row">
+								<div class="arrow">
+									<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M2.117 12l7.527 6.235-.644.765-9-7.521 9-7.479.645.764-7.529 6.236h21.884v1h-21.883z"/></svg>							</div>
+							</div>
+						</div>
+					</div>
+					<div class="content-column">
 						<div class="content-block-wrapper area">
 							<div class="content-block">
 								<div class="block-title">
@@ -113,68 +179,31 @@
 									<div class="align-left">
 										<form action="#" class="canvas-control form">
 											<input
-													type="radio"
-													id="transformationYCC-select_y"
-													name="transformationYCC-select"
-													value="y"
-													checked
+												type="radio"
+												id="transformationColor-select_y"
+												name="transformationColor-select"
+												value="y"
+												checked
 											/>
-											<label for="transformationYCC-select_y">Y</label>
+											<label for="transformationColor-select_y">Y</label>
 											<input
-													type="radio"
-													id="transformationYCC-select_cb"
-													name="transformationYCC-select"
-													value="cb"
+												type="radio"
+												id="transformationColor-select_cb"
+												name="transformationColor-select"
+												value="cb"
 											/>
-											<label for="transformationYCC-select_cb">C<sub>b</sub></label>
+											<label for="transformationColor-select_cb">C<sub>b</sub></label>
 											<input
-													type="radio"
-													id="transformationYCC-select_cr"
-													name="transformationYCC-select"
-													value="cr"
+												type="radio"
+												id="transformationColor-select_cr"
+												name="transformationColor-select"
+												value="cr"
 											/>
-											<label for="transformationYCC-select_cr">C<sub>r</sub></label>
+											<label for="transformationColor-select_cr">C<sub>r</sub></label>
 										</form>
 									</div>
-									<div class="image-area medium-image-area" id="transformationYCCImageArea">
-										<canvas id="transformationYCCCanvas" width="320" height="320"></canvas>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="content-column align-top">
-						<div class="content-block-wrapper area">
-							<div class="content-block">
-								<div class="block-title">
-									<p>Výběr podvzorkovacího schématu</p>
-								</div>
-								<div class="image-block">
-									<div>
-										<form action="#" class="canvas-control form">
-											<input
-													type="radio"
-													id="subsampling-scheme-select_444"
-													name="subsampling-scheme-control"
-													value="4:4:4"
-													checked
-											/>
-											<label for="subsampling-scheme-select_444">4:4:4</label>
-											<input
-													type="radio"
-													id="subsampling-scheme-select_420"
-													name="subsampling-scheme-control"
-													value="4:2:0"
-											/>
-											<label for="subsampling-scheme-select_420">4:2:0</label>
-											<input
-													type="radio"
-													id="subsampling-scheme-select_422"
-													name="subsampling-scheme-control"
-													value="4:2:2"
-											/>
-											<label for="subsampling-scheme-select_422">4:2:2</label>
-										</form>
+									<div class="image-area medium-image-area" id="transformationColorImageArea">
+										<canvas id="transformationCanvas" width="320" height="320"></canvas>
 									</div>
 								</div>
 							</div>
@@ -182,55 +211,77 @@
 						<div class="content-block-wrapper area">
 							<div class="content-block">
 								<div class="block-title">
-									<p>Obrázek po podvzorkovaní</p>
+									<p>Podvzorkování</p>
 								</div>
 								<div class="image-block">
 									<div class="align-left">
 										<form action="#" class="canvas-control form">
 											<input
-													type="radio"
-													id="subsampling-transformation-select_original"
-													name="subsampling-transformation-select"
-													value="original"
-													checked
+												type="radio"
+												id="subsamplingColor-select_y"
+												name="subsamplingColor-select"
+												value="y"
+												checked
 											/>
-											<label for="subsampling-transformation-select_original"
-											>Originál</label
-											>
+											<label for="subsamplingColor-select_y">Y</label>
 											<input
-													type="radio"
-													id="subsampling-transformation-select_y"
-													name="subsampling-transformation-select"
-													value="y"
+												type="radio"
+												id="subsamplingColor-select_cb"
+												name="subsamplingColor-select"
+												value="cb"
 											/>
-											<label for="subsampling-transformation-select_y">Y</label>
+											<label for="subsamplingColor-select_cb">C<sub>b</sub></label>
 											<input
-													type="radio"
-													id="subsampling-transformation-select_cb"
-													name="subsampling-transformation-select"
-													value="cb"
+												type="radio"
+												id="subsamplingColor-select_cr"
+												name="subsamplingColor-select"
+												value="cr"
 											/>
-											<label for="subsampling-transformation-select_cb"
-											>C<sub>b</sub></label
-											>
-											<input
-													type="radio"
-													id="subsampling-transformation-select_cr"
-													name="subsampling-transformation-select"
-													value="cr"
-											/>
-											<label for="subsampling-transformation-select_cr"
-											>C<sub>r</sub></label
-											>
+											<label for="subsamplingColor-select_cr">C<sub>r</sub></label>
 										</form>
 									</div>
-									<div class="image-area large-image-area" id="subsamplingImageArea">
+									<div class="image-area medium-image-area" id="subsamplingImageArea">
 										<canvas id="subsamplingCanvas" width="320" height="320"></canvas>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
+						<div class="content-column">
+							<div class="content-block-wrapper area">
+								<div class="content-block">
+									<div class="block-title">
+										<p>Schéma podvzorkování</p>
+									</div>
+									<div>
+										<form action="#" class="canvas-control form">
+											<input
+												type="radio"
+												id="subsamplingScheme-select_444"
+												name="subsamplingScheme-select"
+												value="4:4:4"
+												checked
+											/>
+											<label for="subsamplingScheme-select_444">4:4:4</label>
+											<input
+												type="radio"
+												id="subsamplingScheme-select_420"
+												name="subsamplingScheme-select"
+												value="4:2:0"
+											/>
+											<label for="subsamplingScheme-select_420">4:2:0</label>
+											<input
+												type="radio"
+												id="subsamplingScheme-select_422"
+												name="subsamplingScheme-select"
+												value="4:2:2"
+											/>
+											<label for="subsamplingScheme-select_422">4:2:2</label>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
 				</div>
 			</div>
 		</div>
@@ -273,7 +324,7 @@
 <script src="../scripts/subsampling.js"></script>
 <script src="../scripts/magnifier.js"></script>
 <script>
-    const controller = new SubsamplingController();
-    controller.init();
+	const controller = new SubsamplingAppletController();
+	controller.init();
 </script>
 </html>

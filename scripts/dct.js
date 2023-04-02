@@ -8,7 +8,7 @@ const MAX_QUALITY = 100;
 const DEFAULT_QUALITY = 50;
 
 // třída kontrolující DCT aplet
-class DCTController {
+class DCTAppletController {
   constructor() {
     this.quality = DEFAULT_QUALITY;
     this.selectedPixelsArea = {
@@ -145,8 +145,7 @@ class DCTController {
       this.quality
     );
     this.quantizationCanvas.setPixelsData(
-      quantizationPixelsData,
-      COLOR_MODES.YCC
+      quantizationPixelsData
     );
     this.quantizationCanvas.update();
     this.setCanvasPixelsValues(this.quantizationCanvas);
@@ -482,12 +481,15 @@ const getIDCTPixelsData = (pixelValues, width, height) => {
   const idctValues = applyIDCT(pixelValues);
   const roundedValues = roundValues(idctValues);
   const increasedValues = roundedValues.map((value) => value + 128);
-  return PixelsData.fromValues(
+  const resultPixelsData = PixelsData.fromValues(
     normalizeValues(increasedValues),
     COLOR_MODES.YCC,
     width,
-    height
+    height,
+    ["y"]
   );
+  resultPixelsData.changeColorMode(COLOR_MODES.RGB);
+  return resultPixelsData;
 };
 
 // získání objektu PixelsData po postupném aplikování všech procesních kroků (DCT, kvantizace, dekvantizace, IDCT)
@@ -523,9 +525,11 @@ const getAllProcessingStepsPixelsData = (pixelsData, quality) => {
       squareRow,
       squareCol,
       SELECT_PIXELS_AREA_SIZE,
-      SELECT_PIXELS_AREA_SIZE
+      SELECT_PIXELS_AREA_SIZE,
+      ["y"]
     );
   }
+  resultPixelsData.changeColorMode(COLOR_MODES.RGB);
   return resultPixelsData;
 };
 

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"/>
+	<title>
+		Vizualizace obrazu po dekompresi
+	</title>
+	<link rel="stylesheet" href="../styles/visualization.css"/>
+</head>
+<body>
+<div class="wrapper">
+	<div class="describe">
+		<p class="title">
+			Vizualizace obrazu po dekompresi
+		</p>
+	</div>
+	<div class="working-area-wrapper">
+		<div class="working-area">
+			<div class="image-selector block-content side-area">
+				<div class="images-block">
+					<form action="#" class="image-control form">
+						<div class="image-container">
+							<label>
+								<input type="radio" name="image-selector" value="bw_1" checked/>
+								<img src="../assets/bw_1.png" alt="source"/>
+							</label>
+						</div>
+						<div class="image-container">
+							<label>
+								<input type="radio" name="image-selector" value="bw_2"/>
+								<img src="../assets/bw_2.png" alt="source2"/>
+							</label>
+						</div>
+						<div class="image-container">
+							<label>
+								<input type="radio" name="image-selector" value="bw_3"/>
+								<img src="../assets/bw_3.png" alt="source3"/>
+							</label>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="processing-area" style="width: calc(100% - 50px)">
+				<div class="content-row">
+					<div class="content-column">
+						<div class="content-block-wrapper align-bottom">
+							<div class="content-block">
+								<div class="block-title">
+									<p>Výběr bloku 8 &#x2715; 8 pixelů</p>
+								</div>
+								<div class="image-block">
+									<div class="image-area medium-image-area" id="selectPixelsBlockImageArea">
+										<canvas id="originalCanvas" width="320" height="320"></canvas>
+									</div>
+									<div class="overlay" id="selectPixelsBlockImageAreaOverlay">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="content-block-wrapper align-top">
+							<div class="content-block">
+								<div class="block-title">
+									<p>Vysledný obrazek</p>
+								</div>
+								<div class="image-block">
+									<div class="image-area medium-image-area">
+										<canvas id="resultCanvas" width="320" height="320"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>					</div>
+					<div class="content-column">
+						<div class="arrow-block-wrapper align-top">
+							<div class="arrow-block up-row">
+								<div class="arrow">
+									<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+										<path d="M21.883 12l-7.527 6.235.644.765 9-7.521-9-7.479-.645.764 7.529 6.236h-21.884v1h21.883z"/>
+									</svg>
+								</div>
+							</div>
+						</div>
+						<div class="arrow-block-wrapper align-bottom">
+							<div class="arrow-block down-row">
+								<div class="arrow">
+									<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M2.117 12l7.527 6.235-.644.765-9-7.521 9-7.479.645.764-7.529 6.236h21.884v1h-21.883z"/></svg>							</div>
+							</div>
+						</div>
+					</div>
+					<div class="content-column">
+						<div class="content-block-wrapper align-bottom">
+							<div class="content-block">
+								<div class="block-title">
+									<p>Blok 8 &#x2715; 8 pixelů</p>
+								</div>
+								<div class="image-block">
+									<div class="image-area small-image-area">
+										<canvas id="originalCroppedCanvas" width="240" height="240"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="content-block-wrapper align-top">
+							<div class="content-block">
+								<div class="block-title">
+									<p>Vysledný blok 8 &#x2715; 8 po IDCT</p>
+								</div>
+								<div class="image-block">
+									<div class="image-area small-image-area">
+										<canvas id="idctCanvas" width="240" height="240"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="content-column">
+						<div class="content-block-wrapper area">
+							<div class="content-block">
+								<div class="block-title">
+									<p>Kvalita</p>
+								</div>
+								<div>
+									<div class="slider-input">
+										<input type="number" id="qualityInput" value="50" min="0" max="100"/>
+									</div>
+									<div class="slider-container">
+										<input
+											type="range"
+											id="qualitySlider"
+											name="quality"
+											min="1"
+											max="100"
+											value="50"
+											step="1"
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="content-block-wrapper area">
+							<div class="content-block">
+								<div class="block-title">
+									<p>Zobrazit hodnoty</p>
+								</div>
+								<div>
+									<input type="checkbox" id="canvasValuesDisplaySwitcher">
+								</div>
+							</div>
+						</div>
+						<div class="content-block-wrapper area">
+							<div class="content-block">
+								<div class="block-title">
+									<p>Způsob zaokrouhlování</p>
+								</div>
+								<div>
+									<form action="#" style="text-align: left" id="roundingModeSelector">
+										<div>
+											<input
+												type="radio"
+												id="roundingMode-select_classic"
+												name="roundingMode-select"
+												value="classic"
+												checked
+											/>
+											<label for="roundingMode-select_classic">Klasické</label>
+										</div>
+										<div>
+										<input
+											type="radio"
+											id="roundingMode-select_05plus"
+											name="roundingMode-select"
+											value="0.5_plus"
+										/>
+										<label for="roundingMode-select_05plus">+0.5</label>
+											</div>
+										<div>
+										<input
+											type="radio"
+											id="roundingMode-select_05minus"
+											name="roundingMode-select"
+											value="0.5_minus"
+										/>
+										<label for="roundingMode-select_05minus">-0.5</label>
+										</div>
+										<div>
+											<input
+												type="radio"
+												id="roundingMode-select_random"
+												name="roundingMode-select"
+												value="random_in_interval"
+											/>
+											<label for="roundingMode-select_random">Random</label>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="description">
+	</div>
+</div>
+</body>
+<script src="../scripts/constants.js"></script>
+<script src="../scripts/utils.js"></script>
+<script src="../scripts/functions.js"></script>
+<script src="../scripts/canvas.js"></script>
+<script src="../scripts/visualization.js"></script>
+<script src="../scripts/magnifier.js"></script>
+<script>
+    const controller = new VisualizationAppletController();
+    controller.init();
+</script>
+</html>
