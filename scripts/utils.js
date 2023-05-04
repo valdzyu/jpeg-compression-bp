@@ -8,6 +8,20 @@ const pick = (obj, props) => {
   return picked;
 }
 
+// vrací kopii objektu
+const cloneObject = (obj) => {
+  return Object.create(obj);
+}
+
+// vrací 2D pole HxW, kde H - počet řádků, W - počet sloupců
+const create2dArray = (rows, columns) => {
+  const arr = new Array(rows);
+  for (let i = 0; i < rows; i++) {
+    arr[i] = new Array(columns);
+  }
+  return arr;
+}
+
 // vrací seznam bloků velikosti SxS, kde S - zvolená velikost bloku
 const getSquares = (array, squareSize, imageWidth) => {
   const rows = getGrid(array, imageWidth);

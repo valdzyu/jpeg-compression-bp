@@ -1,17 +1,17 @@
 // generuje kvantizační matici dle zvolené kvality
 const generateQuantizationMatrix = (quality) => {
   const matrix = new Array(64);
-  if (quality >= 100) {
-    return matrix.fill(1);
-  }
-  const factor = quality < 51 ? 50 / quality : 2 - 2 / quality;
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      matrix[row * 8 + col] = QUANTIZATION_MATRIX[row * 8 + col] * factor;
-    }
+  for (let i = 0; i < 64; i++) {
+    const value = Math.round((QUANTIZATION_MATRIX[i] * (quality < 50 ? 5000 / quality : 200 - 2 * quality)) / 100);
+    matrix[i] = Math.round(
+      Math.max(
+        1,
+        Math.min(255, value)
+      )
+    );
   }
   return matrix;
-};
+}
 
 // aplikuje DCT na blok pixelů
 const applyDCT = (block) => {
@@ -89,13 +89,16 @@ const applySpecificRoundingMode = (values, roundingMode) => {
 
 // vrací funkci pro zaokrouhlování podle zvoleného módu
 const getRoundingFunctionByMode = (roundingMode) => {
-  if (roundingMode === "0.5_plus") {
-    return (value) => value + 0.5;
-  } else if (roundingMode === "0.5_minus") {
-    return (value) => value - 0.5;
+  if (roundingMode === "classic") {
+    return (value) => Math.round(value);
+  } else if (roundingMode === "maximal") {
+    return (value) => Math.round(value) + 0.499;
+  } else if (roundingMode === "minimal") {
+    return (value) => Math.round(value) - 0.499;
   } else if (roundingMode === "random_in_interval") {
-    const randomNumberInInterval = Math.round((Math.random() - 0.5) * 10) / 10
-    return (value) => value + randomNumberInInterval;
+    const randomPositiveNumber =  Math.random() * 0.499;
+    const randomNumberInInterval = Math.random() < 0.5 ? randomPositiveNumber : -randomPositiveNumber;
+    return (value) =>  Math.round(value) + randomNumberInInterval;
   }
   return (x) => x;
 }

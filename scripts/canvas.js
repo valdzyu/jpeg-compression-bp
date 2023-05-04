@@ -129,7 +129,15 @@ class PixelsData {
       }
     }
   }
-
+  // metoda pro vytvoření kopie objektu (bez referencí na původní objekt)
+  clone() {
+    return new PixelsData(
+      this.pixels.map((x) => cloneObject(x)),
+      this.colorMode,
+      this.width,
+      this.height,
+    );
+  }
   // metoda pro vytvoření objektu z hodnot jednotlivých pixelů
   static fromValues(
     values,

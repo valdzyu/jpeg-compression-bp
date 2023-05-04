@@ -19,6 +19,8 @@ class VisualizationAppletController {
 			row: 0,
 		};
 		this.originalPixelsData = null;
+		this.originalRecalculatedPixelsData = null;
+		this.recalculatedIDCTValues = [];
 	}
 
 	// inicializace všech potřebných prvků apletu
@@ -59,6 +61,12 @@ class VisualizationAppletController {
 			imageData,
 			COLOR_MODES.RGB
 		);
+		const recalculatedData = getRecalculatedPixelsData(
+			this.originalPixelsData.clone(),
+			this.roundingModeValue
+		);
+		this.originalRecalculatedPixelsData = recalculatedData.pixelData;
+		this.recalculatedIDCTValues = recalculatedData.idctValues;
 	}
 
 	// vytvoření všech pláten a jejich inicializace
@@ -93,14 +101,16 @@ class VisualizationAppletController {
 
 	// aktualizace plátna s výchozím obrázkem
 	updateOriginalCanvas() {
-		this.originalCanvas.setPixelsData(this.originalPixelsData, COLOR_MODES.RGB);
+		const pixelsDataToSet = this.roundingModeValue === "classic" ? this.originalPixelsData : this.originalRecalculatedPixelsData
+		this.originalCanvas.setPixelsData(pixelsDataToSet);
 		this.originalCanvas.update();
 	}
 
 	// aktualizace plátna s vybraným blokem
 	updateOriginalCroppedCanvas() {
+		const pixelsDataToCrop = this.roundingModeValue === "classic" ? this.originalPixelsData : this.originalRecalculatedPixelsData
 		const croppedPixelsData = getCroppedPixelsData(
-			this.originalPixelsData,
+			pixelsDataToCrop.clone(),
 			this.selectedPixelsArea.row,
 			this.selectedPixelsArea.column
 		);
@@ -111,11 +121,19 @@ class VisualizationAppletController {
 
 	// aktualizace plátna s pixely po IDCT transformací
 	updateIDCTCanvas() {
-		const idctPixelsData = getIDCTPixelsData(
-			this.originalCroppedCanvas.pixelsData,
-			this.qualityValue,
-			this.roundingModeValue
-		);
+		let idctPixelsData;
+		if (this.roundingModeValue === "classic") {
+			idctPixelsData = getIDCTPixelsData(
+				this.originalCroppedCanvas.pixelsData.clone(),
+				this.qualityValue,
+				this.roundingModeValue,
+			);
+		} else {
+			idctPixelsData = getIDCTRecalculatedPixelsData(
+				this.recalculatedIDCTValues[this.selectedPixelsArea.row][this.selectedPixelsArea.column],
+				this.qualityValue
+			);
+		}
 		this.idctCanvas.setPixelsData(idctPixelsData);
 		this.idctCanvas.update();
 		this.setCanvasPixelsValues(this.idctCanvas);
@@ -123,11 +141,20 @@ class VisualizationAppletController {
 
 	// aktualizace plátna s výsledným obrázkem
 	updateResultCanvas() {
-		const resultPixelsData = getAllProcessingStepsPixelsData(
-			this.originalPixelsData,
-			this.qualityValue,
-			this.roundingModeValue
-		);
+		let resultPixelsData;
+		if (this.roundingModeValue === "classic") {
+			resultPixelsData = getAllProcessingStepsPixelsData(
+				this.originalPixelsData.clone(),
+				this.qualityValue,
+			);
+		} else {
+			resultPixelsData = getResultRecalculatedPixelsData(
+				this.recalculatedIDCTValues,
+				this.qualityValue,
+				this.resultCanvas.width,
+				this.resultCanvas.height
+			);
+		}
 		this.resultCanvas.setPixelsData(resultPixelsData);
 		this.resultCanvas.update();
 	}
@@ -207,6 +234,14 @@ class VisualizationAppletController {
 		roundingModeRadioButtons.forEach(btn => {
 			btn.addEventListener("change", (e) => {
 				this.setRoundingMode(e.target.value);
+				const recalculatedData = getRecalculatedPixelsData(
+					this.originalPixelsData.clone(),
+					this.roundingModeValue
+				);
+				this.originalRecalculatedPixelsData = recalculatedData.pixelData;
+				this.recalculatedIDCTValues = recalculatedData.idctValues;
+				this.updateOriginalCanvas();
+				this.updateOriginalCroppedCanvas();
 				this.updateIDCTCanvas();
 				this.updateResultCanvas();
 			});
@@ -227,6 +262,7 @@ class VisualizationAppletController {
 		addOverlayToCanvas(this.originalCroppedCanvas.targetElement, overlay.cloneNode(true));
 		addOverlayToCanvas(this.idctCanvas.targetElement, overlay.cloneNode(true));
 	}
+
 	// přidání zobrazení hodnot pixelů do vybraného plátna
 	setCanvasPixelsValues(canvas) {
 		const overlay =
@@ -392,28 +428,24 @@ const getCroppedPixelsData = (pixelsData, blockRow, blockColumn) => {
 		x2 - x1 + 1,
 		y2 - y1 + 1
 	);
-	resultPixelsData.originalValues =  resultPixelsData.getComponentValues("r");
+	resultPixelsData.originalValues = resultPixelsData.getComponentValues("r");
 	return resultPixelsData;
 };
 
 // získání objektu PixelsData s pixely po aplikaci IDCT
-const getIDCTPixelsData = (pixelsData, quality, roundingMode) => {
+const getIDCTPixelsData = (pixelsData, quality) => {
 	pixelsData = pixelsData.convertToColorMode(COLOR_MODES.YCC);
 	const yComponentValues = pixelsData.getComponentValues("y");
 	const reducedValues = yComponentValues.map((value) => value - 128);
 	const dctValues = applyDCT(getGrid(reducedValues, SELECT_PIXELS_AREA_SIZE));
-	const decimalAfterDCTValues = toFixedValues(dctValues, 2);
-	const quantizedValues = applyQuantization(decimalAfterDCTValues, quality);
-	let roundedAfterQuantizationValues = roundValues(quantizedValues);
-	if (roundingMode !== "classic") {
-		roundedAfterQuantizationValues = applySpecificRoundingMode(
-			roundedAfterQuantizationValues,
-			roundingMode
-		);
-	}
-	const dequantizedValues = applyDequantization(roundedAfterQuantizationValues, quality);
+	const quantizedValues = applyQuantization(dctValues, quality);
+	const roundedAfterQuantizationValues = roundValues(quantizedValues);
+	const dequantizedValues = applyDequantization(
+		roundedAfterQuantizationValues,
+		quality
+	);
 	const idctValues = applyIDCT(dequantizedValues);
-	let roundedAfterIDCTValues = roundValues(idctValues);
+	const roundedAfterIDCTValues = roundValues(idctValues);
 	const increasedValues = roundedAfterIDCTValues.map((value) => value + 128);
 	const resultPixelsData = PixelsData.fromValues(
 		normalizeValues(increasedValues),
@@ -427,8 +459,74 @@ const getIDCTPixelsData = (pixelsData, quality, roundingMode) => {
 	return resultPixelsData;
 };
 
+// získání objektu PixelsData s pixely po aplikaci IDCT na základě přepočítaných hodnot
+const getIDCTRecalculatedPixelsData = (initialValues, quality) => {
+	const dctValues = applyDCT(getGrid(initialValues, SELECT_PIXELS_AREA_SIZE));
+	const quantizedValues = applyQuantization(dctValues, quality);
+	const roundedAfterQuantizationValues = roundValues(quantizedValues);
+	const dequantizedValues = applyDequantization(
+		roundedAfterQuantizationValues,
+		quality
+	);
+	const idctValues = applyIDCT(dequantizedValues);
+	const roundedAfterIDCTValues = roundValues(idctValues);
+	const increasedValues = roundedAfterIDCTValues.map((value) => value + 128);
+	const resultPixelsData = PixelsData.fromValues(
+		normalizeValues(increasedValues),
+		COLOR_MODES.YCC,
+		SELECT_PIXELS_AREA_SIZE,
+		SELECT_PIXELS_AREA_SIZE,
+		["y"]
+	);
+	resultPixelsData.changeColorMode(COLOR_MODES.RGB);
+	resultPixelsData.originalValues = resultPixelsData.getComponentValues("r");
+	return resultPixelsData;
+};
+
+// získání objektu PixelsData s přepočítanými pixely původního obrázku
+const getRecalculatedPixelsData = (pixelsData, roundingMode) => {
+	pixelsData = pixelsData.convertToColorMode(COLOR_MODES.YCC);
+	const squares = getSquares(
+		pixelsData.pixels,
+		SELECT_PIXELS_AREA_SIZE,
+		pixelsData.width
+	);
+	let resultPixelsData = new PixelsData(
+		[],
+		COLOR_MODES.YCC,
+		pixelsData.width,
+		pixelsData.height
+	);
+	const squaresRowsNumber = Math.ceil(pixelsData.height / SELECT_PIXELS_AREA_SIZE);
+	const squaresColumnsNumber = Math.ceil(pixelsData.width / SELECT_PIXELS_AREA_SIZE);
+	const idctValues = create2dArray(squaresRowsNumber, squaresColumnsNumber);
+	for (const {squareRow, squareCol, square} of squares) {
+		const yComponentValues = square.map((pixel) => pixel.y);
+		const reducedValues = yComponentValues.map((value) => value - 128);
+		const dctValues = applyDCT(getGrid(reducedValues, SELECT_PIXELS_AREA_SIZE));
+		const roundedAfterQuantizationValues = applySpecificRoundingMode(
+			dctValues,
+			roundingMode
+		);
+		const squareIdctValues = applyIDCT(roundedAfterQuantizationValues);
+		idctValues[squareRow][squareCol] = squareIdctValues
+		const increasedValues = squareIdctValues.map((value) => value + 128);
+		const roundedAfterIDCTValues = roundValues(increasedValues);
+		resultPixelsData.addPixelValues(
+			normalizeValues(roundedAfterIDCTValues),
+			squareRow,
+			squareCol,
+			SELECT_PIXELS_AREA_SIZE,
+			SELECT_PIXELS_AREA_SIZE,
+			["y"]
+		);
+	}
+	resultPixelsData.changeColorMode(COLOR_MODES.RGB);
+	return {pixelData:resultPixelsData, idctValues: idctValues};
+};
+
 // získání objektu PixelsData po postupném aplikování všech procesních kroků (DCT, kvantizace, dekvantizace, IDCT)
-const getAllProcessingStepsPixelsData = (pixelsData, quality, roundingMode) => {
+const getAllProcessingStepsPixelsData = (pixelsData, quality) => {
 	pixelsData = pixelsData.convertToColorMode(COLOR_MODES.YCC);
 	const squares = getSquares(
 		pixelsData.pixels,
@@ -445,30 +543,58 @@ const getAllProcessingStepsPixelsData = (pixelsData, quality, roundingMode) => {
 		const yComponentValues = square.map((pixel) => pixel.y);
 		const reducedValues = yComponentValues.map((value) => value - 128);
 		const dctValues = applyDCT(getGrid(reducedValues, SELECT_PIXELS_AREA_SIZE));
-		const decimalAfterDCTValues = toFixedValues(dctValues, 2);
-		const quantizedValues = applyQuantization(decimalAfterDCTValues, quality);
-		let roundedAfterQuantizationValues = roundValues(quantizedValues);
-		if (roundingMode !== "classic") {
-			roundedAfterQuantizationValues = applySpecificRoundingMode(
-				roundedAfterQuantizationValues,
-				roundingMode
-			);
-		}
+		const quantizedValues = applyQuantization(dctValues, quality);
+		const roundedAfterQuantizationValues = roundValues(quantizedValues);
 		const dequantizedValues = applyDequantization(
 			roundedAfterQuantizationValues,
 			quality
 		);
 		const idctValues = applyIDCT(dequantizedValues);
-		const roundedAfterIDCTValues = roundValues(idctValues);
-		const increasedValues = roundedAfterIDCTValues.map((value) => value + 128);
+		const increasedValues = idctValues.map((value) => value + 128);
+		const roundedAfterIDCTValues = roundValues(increasedValues);
 		resultPixelsData.addPixelValues(
-			normalizeValues(increasedValues),
+			normalizeValues(roundedAfterIDCTValues),
 			squareRow,
 			squareCol,
 			SELECT_PIXELS_AREA_SIZE,
 			SELECT_PIXELS_AREA_SIZE,
 			["y"]
 		);
+	}
+	resultPixelsData.changeColorMode(COLOR_MODES.RGB);
+	return resultPixelsData;
+};
+
+// získání objektu PixelsData po postupném aplikování všech procesních kroků (DCT, kvantizace, dekvantizace, IDCT) na základě přepočítaných hodnot
+const getResultRecalculatedPixelsData = (initialValues, quality, width, height) => {
+	let resultPixelsData = new PixelsData(
+		[],
+		COLOR_MODES.YCC,
+		width,
+		height
+	);
+	for (let squareRow = 0; squareRow < initialValues.length; squareRow++) {
+		for (let squareCol = 0; squareCol < initialValues[0].length; squareCol++) {
+			const reducedValues = initialValues[squareRow][squareCol];
+			const dctValues = applyDCT(getGrid(reducedValues, SELECT_PIXELS_AREA_SIZE));
+			const quantizedValues = applyQuantization(dctValues, quality);
+			let roundedAfterQuantizationValues = roundValues(quantizedValues);
+			const dequantizedValues = applyDequantization(
+				roundedAfterQuantizationValues,
+				quality
+			);
+			const idctValues = applyIDCT(dequantizedValues);
+			const increasedValues = idctValues.map((value) => value + 128);
+			const roundedAfterIDCTValues = roundValues(increasedValues);
+			resultPixelsData.addPixelValues(
+				normalizeValues(roundedAfterIDCTValues),
+				squareRow,
+				squareCol,
+				SELECT_PIXELS_AREA_SIZE,
+				SELECT_PIXELS_AREA_SIZE,
+				["y"]
+			);
+		}
 	}
 	resultPixelsData.changeColorMode(COLOR_MODES.RGB);
 	return resultPixelsData;
