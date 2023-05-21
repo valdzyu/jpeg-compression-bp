@@ -13,6 +13,12 @@
 		<p class="title">
 			Vizualizace obrazu po dekompresi
 		</p>
+		<p>
+			Tato webová aplikace se zabývá problematikou hlavního ztrátového procesu v algoritmu JPEG - kvantování DCT koeficientů a slouzi ukazkou jak by mohly vypadat obrázky, které by se po zaokrouhlování kvantovanych DCT koeficientu měly stejné hodnoty.
+		</p>
+		<p>
+			V levé části okna je umístěna galerie obrázků ke zpracování. Jednotlivý blok pixelů je možné vybrat kliknutím po obrázku „Výběr bloku 8 &#x2715; 8 pixelů”. V bloku „Způsob zaokrouhlovani” uživatel je schopen vybrat z čtyř možností tzv. „zaokrouhlení”.
+		</p>
 	</div>
 	<div class="working-area-wrapper">
 		<div class="working-area">
@@ -180,6 +186,30 @@
 		</div>
 	</div>
 	<div class="description">
+		<p>
+			Z teorie je známo, že při kvantování DCT koeficientů se většina nepodstatných obrazových dat nevratně ztrácí zaokrouhlováním. Výsledkem aritmetického zaokrouhlení je nejbližší celé číslo k tomu, co bylo zaokrouhleno.
+		</p>
+		<p>
+			Například <code>a=7,4</code> a <code>b=6,5</code>. Podle implementaci funkce <code>round()</code> jsou oba tato čísla zaokrouhlena na <code>7</code>, což znamená, že jakékoliv číslo z rozmezí <code>[6,5; 7,5)</code> bude funkci <code>round()</code> zaokrouhleno na <code>7</code>.
+		</p>
+		<p class="article-title">
+			Způsoby zaokrouhlování
+		</p>
+		<p>
+			„klasické” — v něm probíhá klasické aritmetické zaokrouhlení pomocí <code>Math.round()</code>. Je výchozím nastavením.
+		</p>
+		<p>
+			„maximální” — k zaokrouhleným DCT koeficientům se přičte <code>0,4999</code>. Tyto nové DCT koeficienty se dekomprimují zped do hodnot pixelů a zobrazí se v blocích „Výběr bloku 8 &#x2715; 8 pixelů”, „Blok 8 &#x2715; 8 pixelů”. Tyto hodnoty pixelů projdou DCT a aritmetickým zaokrouhlováním a zobrazí se ve dvou spodních blocích „Vysledný obrazek” a „Vysledný blok 8 &#x2715; 8 po IDCT”.
+		</p>
+		<p>
+			„minimální” — z zaokrouhlených DCT koeficientů se odečte <code>0,4999</code>. Pak proběhne stejný proces jak u předchozího módu (maximální).
+		</p>
+		<p>
+			„náhodné” — k zaokrouhlenému DCT koeficientů se přičte náhodná hodnota z intervalu <code>[-0,4999; 0,4999]</code>. Pak proběhne stejný proces jak při výběru módu „maximalni”.
+		</p>
+		<p>
+			Při zvolení jakéhokoliv z módu zaokrouhlení v blocích „Vysledný obrazek” a „Vysledný blok 8 &#x2715; 8 po IDCT” se nebude nic měnit, protože jak původní, tak i vytvořené na jeho základě obrázky mají takové hodnoty pixelů, které ve výsledku se zaokrouhlí na stejná čísla.
+		</p>
 	</div>
 </div>
 </body>
