@@ -1,18 +1,14 @@
 // rozmer jednoho bloku který uživatel vybere
 const SELECT_PIXELS_AREA_SIZE = 8;
-
-// hodnoty omezující kvalitu komprese
-const MIN_QUALITY = 1;
-const MAX_QUALITY = 100;
-// výchozí hodnota kvality komprese
-const DEFAULT_QUALITY = 50;
-
+// výchozí kvalita komprese
+const DEFAULT_COMPRESSION_QUALITY = 100;
+// výchozí mod zaokrouhlování
 const DEFAULT_ROUNDING_MODE_VALUE = "classic";
 
 // třída kontrolující DCT aplet
 class VisualizationAppletController {
 	constructor() {
-		this.qualityValue = DEFAULT_QUALITY;
+		this.qualityValue = DEFAULT_COMPRESSION_QUALITY;
 		this.roundingModeValue = DEFAULT_ROUNDING_MODE_VALUE;
 		this.selectedPixelsArea = {
 			column: 0,
@@ -33,7 +29,6 @@ class VisualizationAppletController {
 	// inicializace ovládacích prvků apletu
 	initControls() {
 		this.initImagesSelector();
-		this.initSlider();
 		this.initPixelsSelector();
 		this.initRoundingModeSelector();
 		this.initCanvasValuesDisplaySwitcher();
@@ -157,39 +152,6 @@ class VisualizationAppletController {
 		}
 		this.resultCanvas.setPixelsData(resultPixelsData);
 		this.resultCanvas.update();
-	}
-
-	// nastavení posuvníku kvality komprese
-	initSlider() {
-		const qualityInput = document.querySelector("input#qualityInput");
-		const qualitySlider = document.querySelector("input#qualitySlider");
-
-		qualityInput.addEventListener("input", (e) => {
-			qualitySlider.value = Math.max(
-				Math.min(e.target.value, MAX_QUALITY),
-				MIN_QUALITY
-			);
-		});
-		qualitySlider.addEventListener("mousemove", (e) => {
-			qualityInput.value = e.target.value;
-		});
-		qualityInput.addEventListener("change", (e) => {
-			const value = Math.max(
-				Math.min(e.target.value, MAX_QUALITY),
-				MIN_QUALITY
-			);
-			qualitySlider.value = value;
-			this.setQuality(value);
-			this.updateIDCTCanvas();
-			this.updateResultCanvas();
-		});
-		qualitySlider.addEventListener("change", (e) => {
-			const value = e.target.value;
-			qualityInput.value = value;
-			this.setQuality(value);
-			this.updateIDCTCanvas();
-			this.updateResultCanvas();
-		});
 	}
 
 	// nastavení ovládaní výběru bloku
@@ -322,11 +284,6 @@ class VisualizationAppletController {
 				overlay.classList.toggle("hidden");
 			});
 		});
-	}
-
-	// setter pro hodnotu kvality komprese
-	setQuality(quality) {
-		this.qualityValue = quality;
 	}
 
 	// setter pro hodnotu zaokrouhlovacího módu
